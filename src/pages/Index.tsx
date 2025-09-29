@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Heart, Music, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
+// Importing the audio asset from project root. Consider moving to /public for a cleaner path.
+// Vite will handle this asset import and serve it as a URL.
+import backgroundSongUrl from "../../Arko - Dariya(Lyrics video)｜Baar baar dekho.mp4";
 
 const FloatingHearts = () => {
   return (
@@ -82,20 +85,14 @@ const ForgivenessButton = () => {
   );
 };
 
-const MusicToggle = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const toggleMusic = () => {
-    setIsPlaying(!isPlaying);
-    // In a real implementation, you would control audio playback here
-  };
-
+const MusicToggle = ({ isPlaying, onToggle }: { isPlaying: boolean; onToggle: () => void }) => {
   return (
     <Button
-      onClick={toggleMusic}
+      onClick={onToggle}
       variant="ghost"
       size="sm"
       className="fixed top-4 right-4 z-10 bg-card/80 backdrop-blur-sm hover:bg-card"
+      aria-label={isPlaying ? "Pause background music" : "Play background music"}
     >
       {isPlaying ? <Music className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
     </Button>
@@ -103,10 +100,61 @@ const MusicToggle = () => {
 };
 
 const Index = () => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Try to autoplay on mount. If blocked, start on first user interaction.
+  useEffect(() => {
+    const tryPlay = async () => {
+      if (!audioRef.current) return;
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch {
+        const onFirstInteraction = async () => {
+          try {
+            await audioRef.current?.play();
+            setIsPlaying(true);
+          } finally {
+            window.removeEventListener("click", onFirstInteraction);
+            window.removeEventListener("touchstart", onFirstInteraction);
+          }
+        };
+        window.addEventListener("click", onFirstInteraction, { once: true });
+        window.addEventListener("touchstart", onFirstInteraction, { once: true });
+      }
+    };
+    tryPlay();
+  }, []);
+
+  const handleToggleMusic = async () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch {
+        // Ignore; user may need to interact first
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden">
+      {/* Hidden background audio player */}
+      <audio
+        ref={audioRef}
+        src={backgroundSongUrl}
+        loop
+        preload="auto"
+        className="hidden"
+      />
+
       <FloatingHearts />
-      <MusicToggle />
+      <MusicToggle isPlaying={isPlaying} onToggle={handleToggleMusic} />
       
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-12">
         <div className="space-y-16">
