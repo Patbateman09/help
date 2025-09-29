@@ -13,28 +13,46 @@ const FloatingHearts = () => {
 };
 
 const ForgivenessButton = () => {
-  const [clicked, setClicked] = useState(false);
+  const [showButtons, setShowButtons] = useState(false);
   const [response, setResponse] = useState<'yes' | 'not-yet' | null>(null);
 
-  const handleClick = () => {
-    if (!clicked) {
-      setClicked(true);
-      // Randomly choose response (in real app, this would be user's choice)
-      // For demo, let's make it more likely to be "yes"
-      const isYes = Math.random() > 0.3;
-      setResponse(isYes ? 'yes' : 'not-yet');
-    }
+  const handleQuestionClick = () => {
+    setShowButtons(true);
+  };
+
+  const handleResponse = (answer: 'yes' | 'not-yet') => {
+    setResponse(answer);
   };
 
   return (
     <div className="text-center">
-      {!clicked ? (
+      {!showButtons && !response ? (
         <Button
-          onClick={handleClick}
+          onClick={handleQuestionClick}
           className="btn-romantic text-lg font-medium"
         >
           Manu, do you forgive me? 💬
         </Button>
+      ) : !response ? (
+        <div className="space-y-6">
+          <p className="text-xl font-dancing text-primary mb-6">
+            Manu, do you forgive me? 💬
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button
+              onClick={() => handleResponse('yes')}
+              className="btn-romantic bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700"
+            >
+              Yes 💕
+            </Button>
+            <Button
+              onClick={() => handleResponse('not-yet')}
+              className="btn-romantic bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700"
+            >
+              Not yet 💭
+            </Button>
+          </div>
+        </div>
       ) : (
         <div className="romantic-card max-w-md mx-auto">
           {response === 'yes' ? (
