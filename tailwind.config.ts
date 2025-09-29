@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        'dancing': ['Dancing Script', 'cursive'],
+        'poppins': ['Poppins', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,6 +51,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        lavender: "hsl(var(--lavender))",
+        'blush-pink': "hsl(var(--blush-pink))",
+        'deep-rose': "hsl(var(--deep-rose))",
+        'soft-purple': "hsl(var(--soft-purple))",
+        'heart-red': "hsl(var(--heart-red))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
